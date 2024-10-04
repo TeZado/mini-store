@@ -13,36 +13,46 @@ export default function ManageItems() {
   const [gST, setGST] = useState([]);
   const [deleteId, setDeleteId] = useState([]);
   const [searching, setSearching] = useState([]);
+  const [itemData, setItemData] = useState({
+    itemNumber: 1,
+    itemName: '',
+    hSN_SAC: '',
+    price: 0,
+    gST: 0,
+  });
 
-  console.log(item_Number);
   const getItemNumber = async () => {
-    axios
-      .get(`${import.meta.env.VITE_REACT_SERVER_URL}/api/v1/item/get-items`)
-      .then((response) => {
-        console.log(response.data.items);
-        setitem_Number(response.data.items.length + 1);
-        setDatabase(response.data.items.reverse());
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_REACT_SERVER_URL}${import.meta.env.VITE_GET_ITEMS}`);
+      setDatabase(response.data.items.reverse());
+    } catch (err) {
+      console.log(err);
+    }
   };
+
   const addItems = async () => {
-    axios
-      .post(`${import.meta.env.VITE_REACT_SERVER_URL}/api/v1/item/add-item`, {
-        Item_Number: item_Number,
-        Item_Name: item_Name,
+    const { itemName, hSN_SAC, price, gST } = itemData;
+    try {
+      const response = await axios.post(`${import.meta.env.VITE_REACT_SERVER_URL}${import.meta.env.VITE_ADD_ITEM}`, {
+        Item_Number: itemData.itemNumber,
+        Item_Name: itemName,
         HSN_SAC: hSN_SAC,
         Price: price,
         GST: gST,
-      })
-      .then(function (response) {
-        console.log(response);
-        setitem_Number(item_Number + 1);
-      })
-      .catch(function (error) {
-        console.log(error);
       });
+      console.log(response);
+      setItemData((prev) => ({
+        ...prev,
+        itemNumber: prev.itemNumber + 1, // increment item number
+        itemName: '',
+        hSN_SAC: '',
+        price: 0,
+        gST: 0,
+      }));
+      getItemNumber(); // refresh the item list
+    } catch (error) {
+      console.log(error);
+    }
   };
   const deleteItem = async () => {
     console.log(deleteId)
@@ -61,13 +71,22 @@ export default function ManageItems() {
       });
   };
 
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setItemData((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
+
+
   // const found = Object.values(database).includes(searching);
   // console.log(found)
   // console.log(searching)
 
   useEffect(() => {
     getItemNumber();
-  }, [item_Number]);
+  }, []);
 
   return (
     <>
@@ -97,6 +116,14 @@ export default function ManageItems() {
                 {" "}
                 <img className="w-6 m-auto" src={addIcon} alt="" />
               </td>
+              <td>{itemData.itemNumber}</td>
+              <td>
+                <input
+                  name="itemName"
+                  type="text"
+                  value={itemData.itemName}
+                  onChange={handleInputChange}
+              <td> <img className="w-6 m-auto" src={addIcon} alt="" /></td>
               <td className="text-center text-xl">{item_Number}</td>
               <td className="h-20">
                 <input
@@ -109,26 +136,56 @@ export default function ManageItems() {
                   required
                 />
               </td>
-              <td className="h-20">
+              <td>
                 <input
+
+                  name="hSN_SAC"
                   className="input w-full max-w-xs text-center text-xl"
                   type="number"
-                  onChange={(e) => setHSN_SAC(e.target.value)}
+                  value={itemData.hSN_SAC}
+                  onChange={handleInputChange}
                   placeholder="Enter HSN / SAC"
                   required
                 />
               </td>
-              <td className="h-20">
+              <td>
                 <input
+                  name="price"
                   className="input w-full max-w-xs text-center text-xl"
                   type="number"
-                  onChange={(e) => setPrice(e.target.value)}
+                  value={itemData.price}
+                  onChange={handleInputChange}
                   placeholder="Enter Price"
                   required
                 />
               </td>
-              <td className="h-20">
+              <td>
                 <input
+                  name="gST"
+                  type="number"
+                  value={itemData.gST}
+                  onChange={handleInputChange}
+                  placeholder="Enter GST Number"
+                />
+              </td>
+              <td>
+                <span>{Number(itemData.price) + Number(itemData.gST) || 0}</span>
+              </td>
+              <td>
+                <button onClick={addItems}>Submit</button>
+              </td>
+            </tr>
+            {database?.map(({ Item_Number, Item_Name, HSN_SAC, Price, GST }, index) => (
+              <tr key={index}>
+                <td>{Item_Number}</td>
+                <td>{Item_Name}</td>
+                <td>{HSN_SAC}</td>
+                <td>{Price}</td>
+                <td>{GST}</td>
+                <td>{Number(Price) + Number(GST)}</td>
+              </tr>
+            ))}
+
                   className="input w-full max-w-xs text-center text-xl"
                   type="number"
                   onChange={(e) => setGST(e.target.value)}
@@ -217,6 +274,7 @@ export default function ManageItems() {
               <button className="btn">No</button>
             </div>
           </form>
+
         </div>
       </dialog>
     </>
