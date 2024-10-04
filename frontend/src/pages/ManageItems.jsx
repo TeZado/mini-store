@@ -50,14 +50,7 @@ export default function ManageItems() {
       .delete(
         `${
           import.meta.env.VITE_REACT_SERVER_URL
-        }/api/v1/item/delete-item/${deleteId}`,
-        {
-          Item_Number: item_Number,
-          Item_Name: item_Name,
-          HSN_SAC: hSN_SAC,
-          Price: price,
-          GST: gST,
-        }
+        }/api/v1/item/delete-item/${deleteId}`
       )
       .then(function (response) {
         console.log(response);
@@ -78,7 +71,7 @@ export default function ManageItems() {
 
   return (
     <>
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto w-9/12 m-auto">
         <table className="table">
           {/* head */}
           <thead>
