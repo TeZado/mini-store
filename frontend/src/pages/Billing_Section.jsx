@@ -1,28 +1,29 @@
-import calLottieImg from "../assets/images/20943780.jpg";
 import data from "../../../raw.json";
+import { useState } from "react";
+import axios from "axios";
+import toast, { Toaster } from "react-hot-toast";
 export default function Billing_Section() {
+  const [searchedItem, setSearchedItem] = useState()
+  const [searchedData, setSearchedData] = useState([])
+  const [selectedName, setSelectedName] = useState([])
+  
+  console.log(searchedItem)
+  const searchItem = async () => {
+    axios
+    .get(`${import.meta.env.VITE_REACT_SERVER_URL}/api/v1/item/find-items/${searchedItem}`)
+      .then(function (response) {
+        console.log(response.data.items);
+        setSearchedData(response.data.items);
+      })
+      .catch(function (error) {
+        console.log(error);
+        toast.error(error.response.data.message);
+      });
+  };
   return (
-    <div className="billing-page">
-      {/* Header Section */}
-      <header className="billing-header">
-        <div className="header-left">
-          <h1>Billing</h1>
-          <p>
-            <strong>Time:</strong> 01:00 PM
-          </p>
-          <p>
-            <strong>Date:</strong> 01 / 10 / 2024
-          </p>
-        </div>
-        <div className="header-right">
-          <h2>SHOPNAME</h2>
-          <p>9876543210</p>
-          <div className="avatar">
-            <span>AVT</span>
-          </div>
-        </div>
-      </header>
-
+    <>
+    <Toaster position="right-corner" reverseOrder={false} />
+     <div className="billing-page">
       {/* Billing Information */}
       <div className="billing-info">
         <div className="customer-details">
@@ -44,6 +45,29 @@ export default function Billing_Section() {
             alt="Billing Illustration"
           />
         </div> */}
+        <div className="m-auto flex flex-col justify-center content-center items-center">
+        <input
+            className="input  w-full max-w-xs text-center text-xl"
+            type="text"
+            placeholder="Enter Item Name"
+            onChange={(e) => {setSearchedItem(e.target.value);searchItem()}}
+            required
+          />
+
+          <tbody>
+          {searchedData?.map(
+                ({Item_Name }, index) => (
+                  <tr key={index}>
+                    <td className="text-center h-10 text-xl rounded-xl bg-inherit p-2" onClick={()=>setSelectedName(Item_Name)}>
+                      {Item_Name}
+                    </td>
+                  </tr>
+                )
+              )}
+          </tbody>
+
+        </div>
+
       <div className="billing-content h-96 overflow-auto"> 
         <table className="billing-table">
           <thead className="top-0 sticky">
@@ -100,5 +124,7 @@ export default function Billing_Section() {
         </div>
       </div>
     </div>
+    </>
+   
   )
 }

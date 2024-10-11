@@ -6,7 +6,7 @@ export default function Dashboard() {
     <>
       <div className="dashboard">
         {/* Header Section */}
-        <header className="dashboard-header">
+        {/* <header className="dashboard-header">
           <div className="header-left">
             <h1>Dashboard</h1>
           </div>
@@ -19,7 +19,7 @@ export default function Dashboard() {
               <span>AVT</span>
             </div>
           </div>
-        </header>
+        </header> */}
 
         {/* Main Content Section */}
         <div className="dashboard-content">
@@ -28,11 +28,8 @@ export default function Dashboard() {
           </div>
 
           <div className="dashboard-buttons">
-            <Link to="/add_items">
-              <button> Add Items</button>
-            </Link>
-            <Link to="/add_items">
-              <button> Edit Items</button>
+            <Link to="/manage_items">
+              <button> Manage Items</button>
             </Link>
             <Link to="/add_items">
               <button>Saved Bills</button>
